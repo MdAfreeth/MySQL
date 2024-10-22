@@ -1,0 +1,87 @@
+CREATE TABLE customers (
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(100) NOT NULL,
+email VARCHAR(100) UNIQUE,
+address VARCHAR(255) NOT NULL
+);
+CREATE TABLE orders(
+id INT AUTO_INCREMENT PRIMARY KEY,
+customer_id INT,
+order_date DATE,
+total_amount DECIMAL(10,2),
+FOREIGN KEY(customer_id) REFERENCES customers(id)
+);
+CREATE TABLE products (
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(100),
+price DECIMAL(10,2),
+description TEXT
+);
+
+INSERT INTO customers(name,email,address) VALUES("ikram","ikram@gmail.com","44 dharnamet vellore"),
+("shakeel","shakeel@gmail.com","33 kovil streer Thiruvnnamalai"),
+("safeer","safeer2gmail.com","55 thiruvnmaiur chennai");
+
+
+INSERT INTO orders (customer_id,order_date,total_amount) VALUES
+(4,'2024-09-01',120.00),(5,'2024-09-30',800.00),(6,'2024-10-20',200.00);
+
+InSERT INTO products(name,price,description)
+ VALUES
+('milk',60.00,'This is Fresh Milk'),
+('Oil',125.00,"This is less Colostroml"),
+("Product C",45.00,"This is less sugar and fat") ;
+
+INSERT INTO order_items(order_id,product_id,quantity) VALUES
+(1,1,30),
+(2,2,50),(3,3,100); 
+
+  
+1.Retrieve all customers who have placed an order in the last 30 days ?
+ SELECT DISTINCT customers.name from customers
+JOIN orders ON customer_id 
+=orders.customer_id
+WHERE orders.order_date >= 
+CURDATE() -INTERVAL 30 DAY
+
+2.Get the total amount of all orders placed by each customer.
+SELECT customers.name,SUM(orders.total_amount)AS total_spent
+from customers
+JOIN orders ON customer_id =orders.customer_id
+GROUP BY customers.name
+
+3.Update the price of Product C to 45.00.
+UPDATE products set price=45.00 WHERE id=6;
+
+4.Add a new column discount to the products table.
+ALTER TABLE products ADD COLUMN discount DECIMAL(5,2) DEFAULT 0.00;
+
+5.Retrieve the top 3 products with the highest price.
+SELECT name,price from products ORDER BY price DESC LIMIT 3
+
+
+6.Get the names of customers who have ordered Product A.
+SELECT DISTINCT customers.name FROM customers 
+JOIN orders ON customers.id=orders.customer_id
+JOIN order_items ON order_id =order_items.order_id
+JOIN products ON order_items.product_id=products.id 
+WHERE products.name="milk";
+
+7.Join the orders and customers tables to retrieve the customer's name and order date for each order. 
+SELECT customers.name ,orders.order_date
+FROM customers
+JOIN orders ON customers.id=orders.customer_id;
+8.Retrieve the orders with a total amount greater than 150.00.
+SELECT * FROM orders WHERE total_amount >=150;
+
+9.Normalize the database by creating a separate table for order items and updating the orders table to reference the order_items table.
+CREATE TABLE order_items (
+id INT AUTO_INCREMENT PRIMARY KEY,
+order_id INT,
+product_id INT,
+quantity INT,
+FOREIGN KEY(order_id) REFERENCES orders(id),
+FOREIGN KEY(product_id) REFERENCES products(id)
+);
+10.Retrieve the average total of all orders.
+SELECT (total_amount) from orders;
